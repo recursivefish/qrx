@@ -1,0 +1,1016 @@
+<style>
+  :root {
+    --bg-teal: #008080;
+    --win-gray: #c0c0c0;
+    --win-white: #ffffff;
+    --win-black: #000000;
+    --win-dark: #808080;
+    --win-blue: #000080;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    cursor: default;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--bg-teal);
+    font-family: "MS Sans Serif", "Segoe UI", sans-serif;
+    font-size: 11px;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* Utils */
+  .outset {
+    background: var(--win-gray);
+    border-top: 1px solid var(--win-white);
+    border-left: 1px solid var(--win-white);
+    border-right: 1px solid var(--win-black);
+    border-bottom: 1px solid var(--win-black);
+    box-shadow: 1px 1px 0 var(--win-dark) inset, -1px -1px 0 var(--win-gray) inset;
+  }
+
+  .inset {
+    background: var(--win-white);
+    border-top: 1px solid var(--win-dark);
+    border-left: 1px solid var(--win-dark);
+    border-right: 1px solid var(--win-white);
+    border-bottom: 1px solid var(--win-white);
+    box-shadow: 1px 1px 0 var(--win-black) inset, -1px -1px 0 var(--win-gray) inset;
+  }
+
+  .btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--win-gray);
+    border-top: 1px solid var(--win-white);
+    border-left: 1px solid var(--win-white);
+    border-right: 1px solid var(--win-black);
+    border-bottom: 1px solid var(--win-black);
+    box-shadow: 1px 1px 0 var(--win-dark) inset;
+  }
+  
+  .btn:active {
+    border-top: 1px solid var(--win-black);
+    border-left: 1px solid var(--win-black);
+    border-right: 1px solid var(--win-white);
+    border-bottom: 1px solid var(--win-white);
+    box-shadow: none;
+    transform: translate(1px, 1px);
+  }
+
+  /* Templates */
+  #templates { display: none; }
+
+  /* Window Component */
+  .window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    padding: 3px;
+    top: 20px;
+    left: 20px;
+    min-width: 200px;
+    width: 400px;
+  }
+
+  .title-bar {
+    background: linear-gradient(90deg, var(--win-blue), #1084d0);
+    color: white;
+    padding: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 18px;
+    margin-bottom: 2px;
+  }
+
+  .title-text {
+    font-weight: bold;
+    margin-left: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .win-controls {
+    display: flex;
+    gap: 2px;
+  }
+
+  .win-btn {
+    width: 16px;
+    height: 14px;
+    font-size: 9px;
+    line-height: 12px;
+    font-weight: bold;
+    color: black;
+  }
+
+  .window-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .address-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px;
+  }
+
+  .address-label {
+    color: black;
+  }
+
+  .address-input-wrapper {
+    flex-grow: 1;
+    display: flex;
+    padding: 2px;
+    background: white;
+  }
+
+  .address-input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .icon-btn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .window-content {
+    min-height: 100px;
+    padding: 5px;
+    overflow: auto;
+  }
+
+  /* Taskbar */
+  .taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    gap: 4px;
+    z-index: 10000;
+  }
+
+  .start-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px;
+    font-weight: bold;
+    height: 22px;
+  }
+
+  .win-logo {
+    width: 14px;
+    height: 14px;
+    background: black; /* Placeholder for logo */
+    clip-path: polygon(0 0, 45% 0, 45% 45%, 0 45%, 0 0, 55% 0, 100% 0, 100% 45%, 55% 45%, 55% 0, 0 55%, 45% 55%, 45% 100%, 0 100%, 0 55%, 55% 55%, 100% 55%, 100% 100%, 55% 100%, 55% 55%);
+    background: linear-gradient(135deg, #ff0000 0%, #ff0000 25%, #00ff00 25%, #00ff00 50%, #0000ff 50%, #0000ff 75%, #ffff00 75%, #ffff00 100%);
+  }
+
+  .divider {
+    width: 2px;
+    height: 20px;
+    border-left: 1px solid var(--win-dark);
+    border-right: 1px solid var(--win-white);
+  }
+
+  .task-list {
+    flex-grow: 1;
+    display: flex;
+    gap: 2px;
+  }
+
+  .tray {
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+  }
+
+  /* Start Menu */
+  .start-menu {
+    position: fixed;
+    bottom: 28px;
+    left: 2px;
+    width: 180px;
+    display: none; /* Hidden by default */
+    flex-direction: row;
+    padding: 2px;
+    z-index: 9999;
+  }
+
+  .start-side {
+    width: 20px;
+    background: var(--win-blue);
+    color: var(--win-white);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 5px;
+  }
+
+  .start-side span {
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .start-items {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .start-item {
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .start-item:hover {
+    background: var(--win-blue);
+    color: white;
+  }
+</style>
+
+<div class="desktop">
+  <!-- Desktop Icons could go here -->
+</div>
+
+<!-- Taskbar Panel -->
+<div class="taskbar outset">
+  <div class="btn start-btn">
+    <div class="win-logo"></div>
+    Start
+  </div>
+  <div class="divider"></div>
+  <div class="task-list">
+    <!-- Active Tasks go here -->
+  </div>
+  <div class="tray inset">
+    <span id="clock">12:00 PM</span>
+  </div>
+</div>
+
+<!-- Start Menu -->
+<div class="start-menu outset">
+  <div class="start-side">
+    <span><strong>Windows</strong> 95</span>
+  </div>
+  <div class="start-items">
+    <div class="start-item">Programs</div>
+    <div class="start-item">Documents</div>
+    <div class="start-item">Settings</div>
+    <div class="start-item">Find</div>
+    <div class="start-item">Help</div>
+    <div class="start-item">Run...</div>
+    <div class="divider" style="width: 100%; height: 2px; border: none; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 2px 0;"></div>
+    <div class="start-item">Shut Down...</div>
+  </div>
+</div>
+
+<!-- Templates -->
+<div id="templates">
+  <!-- Reusable Window Template -->
+  <div class="window outset" data-template="window">
+    <div class="title-bar">
+      <div class="title-text">New Window</div>
+      <div class="win-controls">
+        <div class="btn win-btn">_</div>
+        <div class="btn win-btn">□</div>
+        <div class="btn win-btn">×</div>
+      </div>
+    </div>
+    
+    <div class="window-body">
+      <!-- Address / Toolbar -->
+      <div class="address-bar-row">
+        <span class="address-label">Address</span>
+        <div class="inset address-input-wrapper">
+          <input type="text" class="address-input" value="C:\" />
+        </div>
+        <div class="btn win-btn icon-btn" title="Go">Go</div>
+        <div class="btn win-btn icon-btn" title="Refresh">↻</div>
+      </div>
+      
+      <!-- Content Area -->
+      <div class="window-content inset">
+        <!-- Dynamic Content -->
+      </div>
+    </div>
+  </div>
+</div><script>
+  // Global variables
+  window.dbName = window.filename || 'filesystem';
+  window.desktopIcons = [];
+  
+  window.renderDesktop = function() {
+    var desktop = document.querySelector('.desktop');
+    if (!desktop) return;
+    
+    // Clear current
+    desktop.innerHTML = '';
+    
+    var request = indexedDB.open(window.dbName);
+    
+    request.onsuccess = function(event) {
+      var db = event.target.result;
+      // Use the first store found, or default to 'files'
+      var storeName = db.objectStoreNames.length > 0 ? db.objectStoreNames[0] : 'files';
+      
+      if (!db.objectStoreNames.contains(storeName)) {
+        console.warn('Store not found:', storeName);
+        return;
+      }
+      
+      var transaction = db.transaction([storeName], 'readonly');
+      var objectStore = transaction.objectStore(storeName);
+      var getAllKeysRequest = objectStore.getAllKeys();
+      
+      getAllKeysRequest.onsuccess = function(e) {
+        var keys = e.target.result;
+        var topLevelItems = new Set();
+        
+        // CSS for icons
+        var iconStyle = "display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 70px; margin: 10px; text-align: center; color: white; cursor: default;";
+        var imgStyle = "font-size: 32px; margin-bottom: 2px; filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.5));";
+        var labelStyle = "font-size: 11px; text-shadow: 1px 1px 0px black; word-break: break-word; padding: 2px;";
+        
+        keys.forEach(function(key) {
+          // Remove leading slash if present
+          var cleanKey = key.startsWith('/') ? key.substring(1) : key;
+          var parts = cleanKey.split('/');
+          var isFolder = parts.length > 1;
+          var rootName = parts[0];
+          
+          if (topLevelItems.has(rootName)) return;
+          topLevelItems.add(rootName);
+          
+          var el = document.createElement('div');
+          el.className = 'desktop-icon';
+          el.setAttribute('style', iconStyle);
+          el.dataset.path = rootName;
+          el.dataset.type = isFolder ? 'folder' : 'file';
+          
+          // Selection logic
+          el.addEventListener('mousedown', function(ev) {
+            document.querySelectorAll('.desktop-icon .icon-label').forEach(l => {
+              l.style.backgroundColor = 'transparent';
+              l.style.color = 'white';
+              l.style.outline = 'none';
+            });
+            var label = this.querySelector('.icon-label');
+            label.style.backgroundColor = 'var(--win-blue)';
+            label.style.color = 'white';
+            label.style.outline = '1px dotted white';
+            ev.stopPropagation();
+          });
+
+          // Icon graphic
+          var iconGraphic = document.createElement('div');
+          iconGraphic.setAttribute('style', imgStyle);
+          iconGraphic.textContent = isFolder ? '📁' : '📄';
+          
+          // Label text
+          var labelText = document.createElement('span');
+          labelText.className = 'icon-label';
+          labelText.setAttribute('style', labelStyle);
+          labelText.textContent = rootName;
+          
+          el.appendChild(iconGraphic);
+          el.appendChild(labelText);
+          
+          desktop.appendChild(el);
+        });
+        
+        // Deselect on background click
+        desktop.addEventListener('mousedown', function(ev) {
+            if(ev.target === desktop) {
+                document.querySelectorAll('.desktop-icon .icon-label').forEach(l => {
+                    l.style.backgroundColor = 'transparent';
+                    l.style.color = 'white';
+                    l.style.outline = 'none';
+                });
+            }
+        });
+      };
+    };
+    
+    request.onupgradeneeded = function(e) {
+       var db = e.target.result;
+       if (!db.objectStoreNames.contains('files')) {
+         db.createObjectStore('files');
+       }
+    };
+  };
+
+  // Execute immediately
+  window.renderDesktop();
+</script><script>
+  window.zIndex = 100;
+
+  window.fsList = function(path, callback) {
+    var request = indexedDB.open(window.dbName);
+    request.onsuccess = function(e) {
+      var db = e.target.result;
+      var storeName = db.objectStoreNames.length > 0 ? db.objectStoreNames[0] : 'files';
+      var transaction = db.transaction([storeName], 'readonly');
+      var store = transaction.objectStore(storeName);
+      var req = store.getAllKeys();
+      
+      req.onsuccess = function(ev) {
+        var keys = ev.target.result;
+        var items = [];
+        var seen = new Set();
+        // Normalize prefix
+        var prefix = path ? (path.endsWith('/') ? path : path + '/') : '';
+        
+        keys.forEach(function(key) {
+          // clean leading slash
+          var cleanKey = key.startsWith('/') ? key.substring(1) : key;
+          
+          if (cleanKey.startsWith(prefix)) {
+            var relative = cleanKey.substring(prefix.length);
+            if (!relative) return; // exact match
+            
+            var parts = relative.split('/');
+            var name = parts[0];
+            if (!name) return; // empty part
+            
+            if (!seen.has(name)) {
+              seen.add(name);
+              // Simple heuristic: if there are remaining parts, or if it's explicitly marked as dir
+              var isFolder = parts.length > 1; 
+              
+              items.push({
+                name: name,
+                path: prefix + name,
+                type: isFolder ? 'folder' : 'file'
+              });
+            }
+          }
+        });
+        callback(items);
+      };
+    };
+  };
+
+  window.renderWindowContent = function(winElement, path) {
+    var content = winElement.querySelector('.window-content');
+    var addressInput = winElement.querySelector('.address-input');
+    
+    // Update address bar
+    addressInput.value = path;
+    
+    // Clear content
+    content.innerHTML = '';
+    
+    // Load items
+    window.fsList(path, function(items) {
+      if (items.length === 0) {
+        content.innerHTML = '<div style="padding:10px; color:gray;">(Empty)</div>';
+        return;
+      }
+      
+      items.forEach(function(item) {
+        var iconContainer = document.createElement('div');
+        iconContainer.className = 'win-icon-item';
+        iconContainer.style.display = 'inline-flex';
+        iconContainer.style.flexDirection = 'column';
+        iconContainer.style.alignItems = 'center';
+        iconContainer.style.width = '64px';
+        iconContainer.style.height = '64px';
+        iconContainer.style.margin = '4px';
+        iconContainer.style.verticalAlign = 'top';
+        iconContainer.style.cursor = 'default';
+        
+        var iconText = item.type === 'folder' ? '📁' : '📄';
+        var iconGraphic = document.createElement('div');
+        iconGraphic.textContent = iconText;
+        iconGraphic.style.fontSize = '24px';
+        
+        var iconLabel = document.createElement('div');
+        iconLabel.textContent = item.name;
+        iconLabel.style.fontSize = '11px';
+        iconLabel.style.textAlign = 'center';
+        iconLabel.style.wordBreak = 'break-word';
+        iconLabel.style.lineHeight = '1.2';
+        iconLabel.style.padding = '0 2px';
+        
+        iconContainer.appendChild(iconGraphic);
+        iconContainer.appendChild(iconLabel);
+        
+        // Click to navigate if folder
+        iconContainer.addEventListener('click', function(e) {
+          e.stopPropagation();
+          // Highlight effect
+          var allLabels = content.querySelectorAll('.win-icon-item div:last-child');
+          allLabels.forEach(l => {
+             l.style.backgroundColor = 'transparent'; 
+             l.style.color = 'black';
+          });
+          iconLabel.style.backgroundColor = 'var(--win-blue)';
+          iconLabel.style.color = 'white';
+          
+          if (item.type === 'folder') {
+            // Navigate
+            window.renderWindowContent(winElement, item.path);
+          }
+        });
+        
+        content.appendChild(iconContainer);
+      });
+    });
+    
+    addressInput.focus();
+  };
+
+  window.createExplorerWindow = function(initialPath) {
+    var template = document.querySelector('[data-template="window"]');
+    var win = template.cloneNode(true);
+    
+    // Make visible and unique
+    win.removeAttribute('data-template');
+    win.style.display = 'flex';
+    win.style.zIndex = ++window.zIndex;
+    
+    // Random position offset
+    var offset = (window.zIndex % 10) * 20;
+    win.style.top = (20 + offset) + 'px';
+    win.style.left = (20 + offset) + 'px';
+    
+    // Set Title
+    win.querySelector('.title-text').textContent = initialPath || 'My Computer';
+    
+    // Address Bar Logic
+    var input = win.querySelector('.address-input');
+    var goBtn = win.querySelector('[title="Go"]');
+    
+    var doNavigate = function() {
+      window.renderWindowContent(win, input.value);
+    };
+    
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doNavigate();
+    });
+    
+    goBtn.addEventListener('click', doNavigate);
+    
+    // Append to body
+    document.body.appendChild(win);
+    
+    // Initial Render
+    window.renderWindowContent(win, initialPath);
+  };
+
+  // Global Event Listener for Desktop Icons
+  document.addEventListener('click', function(e) {
+    // Check if clicked element is a desktop icon
+    var target = e.target;
+    while(target && target !== document.body) {
+      if (target.classList.contains('desktop-icon')) {
+        // Found icon
+        var path = target.dataset.path;
+        // Open window
+        window.createExplorerWindow(path);
+        return;
+      }
+      target = target.parentNode;
+    }
+  });
+</script><script>
+  window.fsStat = function(path, callback) {
+    var request = indexedDB.open(window.dbName);
+    request.onsuccess = function(e) {
+      var db = e.target.result;
+      var storeName = db.objectStoreNames.length > 0 ? db.objectStoreNames[0] : 'files';
+      var transaction = db.transaction([storeName], 'readonly');
+      var store = transaction.objectStore(storeName);
+      
+      var key = path.startsWith('/') ? path.substring(1) : path;
+      var req = store.get(key);
+      
+      req.onsuccess = function(ev) {
+        if (ev.target.result !== undefined) {
+          callback({ type: 'file' });
+        } else {
+          callback({ type: 'folder' });
+        }
+      };
+      req.onerror = function() { callback({ type: 'folder' }); };
+    };
+    request.onerror = function() { callback({ type: 'folder' }); };
+  };
+
+  window.renderWindowContent = function(win, path) {
+    var content = win.querySelector('.window-content');
+    var addrInput = win.querySelector('.address-input');
+    
+    // Update Address Bar
+    addrInput.value = path;
+    
+    // Clear content temporarily
+    content.innerHTML = '';
+    
+    window.fsStat(path, function(stat) {
+      if (stat.type === 'file') {
+        // --- FILE VIEW (Iframe) ---
+        content.style.padding = '0';
+        content.style.overflow = 'hidden';
+        content.style.height = '300px'; // Set a fixed height for the viewer
+        
+        var iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        iframe.style.background = 'white';
+        
+        // Determine base filename (current file)
+        var base = window.filename || window.location.pathname.split('/').pop() || 'index.html';
+        iframe.src = base + '#' + path;
+        
+        // Listen for hash changes from within the iframe
+        iframe.onload = function() {
+          try {
+            iframe.contentWindow.addEventListener('hashchange', function() {
+              var newHash = iframe.contentWindow.location.hash;
+              if (newHash.startsWith('#')) {
+                addrInput.value = newHash.substring(1);
+              }
+            });
+          } catch(e) {
+            console.log('Cross-origin restriction on iframe access');
+          }
+        };
+        
+        content.appendChild(iframe);
+        
+      } else {
+        // --- FOLDER VIEW (Icons) ---
+        content.style.padding = '5px';
+        content.style.overflow = 'auto';
+        content.style.height = ''; // Reset height to auto/min-height
+        
+        window.fsList(path, function(items) {
+          if (items.length === 0) {
+            content.innerHTML = '<div style="padding:10px; color:gray;">(Empty)</div>';
+            return;
+          }
+          
+          items.forEach(function(item) {
+            var el = document.createElement('div');
+            el.className = 'win-icon-item';
+            el.style.display = 'inline-flex';
+            el.style.flexDirection = 'column';
+            el.style.alignItems = 'center';
+            el.style.width = '64px';
+            el.style.margin = '4px';
+            el.style.verticalAlign = 'top';
+            
+            var iconStr = item.type === 'folder' ? '📁' : '📄';
+            
+            el.innerHTML = 
+              '<div style="font-size: 24px;">' + iconStr + '</div>' +
+              '<div style="font-size: 11px; text-align: center; word-break: break-word; padding: 0 2px;">' + item.name + '</div>';
+            
+            el.addEventListener('click', function(e) {
+              e.stopPropagation();
+              // Deselect others
+              win.querySelectorAll('.win-icon-item div:last-child').forEach(function(lbl) {
+                lbl.style.backgroundColor = 'transparent';
+                lbl.style.color = 'black';
+              });
+              // Select this
+              var label = el.querySelector('div:last-child');
+              label.style.backgroundColor = 'var(--win-blue)';
+              label.style.color = 'white';
+              
+              // Navigate (Open file or Enter folder)
+              window.renderWindowContent(win, item.path);
+            });
+            
+            content.appendChild(el);
+          });
+        });
+      }
+    });
+  };
+</script><script>
+  // -- Window Management Globals --
+  window.dragState = null;
+  window.resizeState = null;
+  window.activeWindow = null;
+  
+  // Helper: Bring window to front
+  window.activateWindow = function(winElement) {
+    if (window.activeWindow === winElement) return;
+    
+    // Update Z-Index
+    window.zIndex = (window.zIndex || 100) + 1;
+    winElement.style.zIndex = window.zIndex;
+    window.activeWindow = winElement;
+    
+    // Update Taskbar styles
+    var taskbarId = winElement.dataset.taskbarId;
+    document.querySelectorAll('.task-item').forEach(function(btn) {
+      if (btn.dataset.windowId === taskbarId) {
+        btn.classList.add('inset');
+        btn.classList.remove('outset'); // Pressed state
+        btn.style.fontWeight = 'bold';
+      } else {
+        btn.classList.remove('inset');
+        btn.classList.add('outset');
+        btn.style.fontWeight = 'normal';
+      }
+    });
+  };
+
+  // -- Mouse Event Handling for Drag & Resize --
+  document.addEventListener('mousedown', function(e) {
+    // 1. Check for Window Drag (Title Bar)
+    var titleBar = e.target.closest('.title-bar');
+    if (titleBar) {
+      var win = titleBar.closest('.window');
+      // Maximize check (double click logic could go here, but sticking to basics)
+      if (win && !e.target.closest('.win-btn')) {
+        e.preventDefault();
+        window.activateWindow(win);
+        
+        // Don't drag if maximized
+        if (win.classList.contains('maximized')) return;
+
+        var rect = win.getBoundingClientRect();
+        window.dragState = {
+          win: win,
+          offsetX: e.clientX - rect.left,
+          offsetY: e.clientY - rect.top
+        };
+        return;
+      }
+    }
+
+    // 2. Check for Resize (Window Border/Body edge)
+    // The .window has padding:3px which acts as the border. 
+    // If we click the .window element directly, we are clicking the border.
+    if (e.target.classList.contains('window')) {
+      var win = e.target;
+      window.activateWindow(win);
+      
+      if (win.classList.contains('maximized')) return;
+
+      var rect = win.getBoundingClientRect();
+      var edgeThreshold = 10; // hit area
+      var resizeType = '';
+
+      // Determine edge
+      if (e.clientY >= rect.bottom - edgeThreshold) resizeType += 's';
+      if (e.clientX >= rect.right - edgeThreshold) resizeType += 'e';
+      
+      // For simplicity in this iteration, we focus on Bottom-Right (se), Bottom (s), Right (e)
+      // Implementing full 8-direction resizing requires more complex cursor checks
+      if (resizeType) {
+        e.preventDefault();
+        window.resizeState = {
+          win: win,
+          startX: e.clientX,
+          startY: e.clientY,
+          startW: rect.width,
+          startH: rect.height,
+          type: resizeType
+        };
+      }
+    }
+    
+    // 3. Bring to front on click content
+    var winContent = e.target.closest('.window');
+    if (winContent) {
+      window.activateWindow(winContent);
+    }
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    // Handle Drag
+    if (window.dragState) {
+      var win = window.dragState.win;
+      var x = e.clientX - window.dragState.offsetX;
+      var y = e.clientY - window.dragState.offsetY;
+      
+      // Optional: constrain to screen? No, Win95 allows offscreen.
+      win.style.left = x + 'px';
+      win.style.top = y + 'px';
+    }
+
+    // Handle Resize
+    if (window.resizeState) {
+      var s = window.resizeState;
+      var dx = e.clientX - s.startX;
+      var dy = e.clientY - s.startY;
+      
+      if (s.type.indexOf('e') > -1) {
+        s.win.style.width = Math.max(150, s.startW + dx) + 'px';
+      }
+      if (s.type.indexOf('s') > -1) {
+        s.win.style.height = Math.max(100, s.startH + dy) + 'px';
+      }
+    }
+    
+    // Cursor handling for border hover could go here
+    if (!window.resizeState && !window.dragState) {
+        if (e.target.classList.contains('window')) {
+            var rect = e.target.getBoundingClientRect();
+            if (e.clientX > rect.right - 10 && e.clientY > rect.bottom - 10) {
+                e.target.style.cursor = 'nwse-resize';
+            } else if (e.clientX > rect.right - 5) {
+                e.target.style.cursor = 'ew-resize';
+            } else if (e.clientY > rect.bottom - 5) {
+                e.target.style.cursor = 'ns-resize';
+            } else {
+                e.target.style.cursor = 'default';
+            }
+        }
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    window.dragState = null;
+    window.resizeState = null;
+  });
+
+  // -- Overwrite createExplorerWindow to add Controls & Taskbar --
+  // We'll store the old function just in case we need logic from it, 
+  // but we mostly need to duplicate the creation logic to inject the buttons properly.
+  // Actually, let's redefine it cleanly.
+  
+  window.createExplorerWindow = function(initialPath) {
+    // 1. Create Window Element
+    var template = document.querySelector('[data-template="window"]');
+    var win = template.cloneNode(true);
+    win.removeAttribute('data-template');
+    
+    // ID for linking to taskbar
+    var winId = 'win_' + Date.now() + Math.random().toString(36).substr(2, 5);
+    win.dataset.taskbarId = winId;
+    
+    // Initial Styles
+    win.style.display = 'flex';
+    win.style.position = 'absolute';
+    
+    // Random position
+    var offset = (document.querySelectorAll('.window:not([data-template])').length % 10) * 20;
+    win.style.top = (20 + offset) + 'px';
+    win.style.left = (20 + offset) + 'px';
+    
+    // Title
+    var titleText = initialPath || 'My Computer';
+    var titleEl = win.querySelector('.title-text');
+    titleEl.textContent = titleText;
+    
+    // -- Button Event Handlers --
+    var ctrls = win.querySelector('.win-controls');
+    var minBtn = ctrls.children[0]; // _
+    var maxBtn = ctrls.children[1]; // □
+    var closeBtn = ctrls.children[2]; // ×
+    
+    // Minimize
+    minBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      win.style.display = 'none';
+      // Taskbar button updates visually in activateWindow, but we need to toggle active state
+      // Actually, standard behavior: focus goes to next window. 
+      // For now, just hide.
+      var taskBtn = document.querySelector('.task-item[data-window-id="' + winId + '"]');
+      if (taskBtn) {
+        taskBtn.classList.remove('inset');
+        taskBtn.classList.add('outset');
+      }
+    });
+    
+    // Maximize
+    maxBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (win.classList.contains('maximized')) {
+        // Restore
+        win.classList.remove('maximized');
+        win.style.top = win.dataset.prevTop;
+        win.style.left = win.dataset.prevLeft;
+        win.style.width = win.dataset.prevWidth;
+        win.style.height = win.dataset.prevHeight;
+      } else {
+        // Maximize
+        win.dataset.prevTop = win.style.top;
+        win.dataset.prevLeft = win.style.left;
+        win.dataset.prevWidth = win.style.width;
+        win.dataset.prevHeight = win.style.height;
+        
+        win.classList.add('maximized');
+        win.style.top = '0';
+        win.style.left = '0';
+        win.style.width = '100vw';
+        win.style.height = 'calc(100vh - 28px)'; // Subtract taskbar
+      }
+    });
+    
+    // Close
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      win.remove();
+      var taskBtn = document.querySelector('.task-item[data-window-id="' + winId + '"]');
+      if (taskBtn) taskBtn.remove();
+    });
+    
+    // -- Address Bar Logic --
+    var input = win.querySelector('.address-input');
+    var goBtn = win.querySelector('[title="Go"]');
+    var refreshBtn = win.querySelector('[title="Refresh"]'); // Assuming icon is ↻
+    
+    var doNavigate = function() {
+      window.renderWindowContent(win, input.value);
+    };
+    
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doNavigate();
+    });
+    goBtn.addEventListener('click', doNavigate);
+    if(refreshBtn) refreshBtn.addEventListener('click', doNavigate);
+    
+    // -- Add to DOM --
+    document.body.appendChild(win);
+    
+    // -- Taskbar Item --
+    var taskbarList = document.querySelector('.task-list');
+    var taskBtn = document.createElement('div');
+    taskBtn.className = 'btn task-item outset';
+    taskBtn.dataset.windowId = winId;
+    taskBtn.style.minWidth = '100px';
+    taskBtn.style.maxWidth = '160px';
+    taskBtn.style.flexGrow = '1';
+    taskBtn.style.height = '22px';
+    taskBtn.style.display = 'flex';
+    taskBtn.style.alignItems = 'center';
+    taskBtn.style.padding = '2px 4px';
+    taskBtn.style.gap = '4px';
+    taskBtn.style.cursor = 'default';
+    
+    // Icon
+    var taskIcon = document.createElement('span');
+    taskIcon.textContent = '📁'; // Simple placeholder
+    taskBtn.appendChild(taskIcon);
+    
+    // Text
+    var taskText = document.createElement('span');
+    taskText.textContent = titleText;
+    taskText.style.overflow = 'hidden';
+    taskText.style.whiteSpace = 'nowrap';
+    taskText.style.textOverflow = 'ellipsis';
+    taskText.style.fontSize = '11px';
+    taskBtn.appendChild(taskText);
+    
+    taskbarList.appendChild(taskBtn);
+    
+    // Taskbar Click
+    taskBtn.addEventListener('click', function() {
+      if (win.style.display === 'none') {
+        win.style.display = 'flex';
+        window.activateWindow(win);
+      } else {
+        if (window.activeWindow === win) {
+          // Minimize
+          win.style.display = 'none';
+          taskBtn.classList.remove('inset');
+          taskBtn.classList.add('outset');
+          window.activeWindow = null;
+        } else {
+          // Bring to front
+          window.activateWindow(win);
+        }
+      }
+    });
+
+    // -- Finalize --
+    window.renderWindowContent(win, initialPath);
+    window.activateWindow(win);
+  };
+</script>

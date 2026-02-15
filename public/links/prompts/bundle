@@ -1,4 +1,4 @@
-bundle?e&w&p=TASK: output HTML wireframe for an indexeddb manager
+#bundle?e&w&p=TASK: output HTML wireframe for an indexeddb manager
   - elements
     - header: "database name", button Load
     - table with 3 columns, headers include: "Title", input[type=checkbox],  actionButtons

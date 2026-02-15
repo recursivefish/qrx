@@ -10,7 +10,7 @@
   - hide templates by default
   - don't include html/head/body tags just the wireframe
 &w&a=1&p=TASK: output SCRIPT tag for rendering top level icons
-  - loop through each indexeddb record (the db name is in the `fileName` global)
+  - loop through each indexeddb record (the db name is in the `filename` global)
   - keys can have slashes in them denoting folders
   - create a 📄 icon for every top level file
     - the label is everything after the final / (or the whole string)
@@ -28,7 +28,7 @@
   - when file icon is single clicked or tapped, show a window for it
   - show a full size iframe in the windows content area
   - set the addressbar to full/file/path
-  - set the iframe to ${fileName}#${full/file/path}
+  - set the iframe to ${filename}#${full/file/path}
   - listen for #hash changes inside the iframe and update the addressbar on change
   - update iframe when user presses in the addressbar or presses Go
   - do this for file icons in folders too
@@ -40,4 +40,3 @@
   - make windows maximizable (and restore size when pressed again)
   - make windows minizable (and show an icon for it in the startbar
 &w
-

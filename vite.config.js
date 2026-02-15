@@ -39,7 +39,26 @@ const qrCodePlugin = () => {
       })
 
       const pwaScript = `<link rel="manifest" href="manifest.webmanifest"><script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js')</script>`
-      writeFileSync(filePath, code + pwaScript)
+
+      const bootloader = `<script>
+        (async () => {
+          try {
+            let d = await getDB();
+            let k = await keys(undefined, d);
+            if (k.length > 0) return;
+
+            let list = await (await fetch('links/index.json')).json();
+            for (let f of [...new Set(list)]) {
+              let content = await (await fetch('links/' + f)).text();
+              await write(content, f, d);
+            }
+            
+            location.reload();
+          } catch (e) { console.error('Bootloader failed', e) }
+        })()
+      </script>`
+
+      writeFileSync(filePath, code + bootloader.replace(/\s+/g, ' ') + pwaScript)
     }
   }
 }
@@ -67,7 +86,7 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
           globIgnores: ['**/404.html'],
           cleanupOutdatedCaches: true,
           clientsClaim: true,
