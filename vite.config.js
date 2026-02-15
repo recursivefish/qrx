@@ -58,16 +58,17 @@ export default defineConfig(({ mode }) => {
         manifest: {
           name: 'QRx',
           short_name: 'qrx',
-          description: 'recursive html file',
+          description: 'a recursive html file small enough to fit in a qr code',
+          display: 'browser',
           theme_color: '#ffffff',
           icons: [
-            { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-            { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' }
+            { src: 'favicon.png', sizes: '192x192', type: 'image/png' },
+            { src: 'favicon.png', sizes: '512x512', type: 'image/png' }
           ]
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-          globIgnores: ['**/404.html', '**/index.qr.png'],
+          globIgnores: ['**/404.html'],
           cleanupOutdatedCaches: true,
           clientsClaim: true,
           skipWaiting: true
