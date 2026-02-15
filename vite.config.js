@@ -41,8 +41,9 @@ const qrCodePlugin = () => {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+
   return {
-    base: env.APP_BASE || '/',
+    base: process.env.BASE_URL || env.BASE_URL || '/',
     plugins: [htmlMinifierPlugin(), qrCodePlugin()],
     build: {
       minify: 'terser',
