@@ -49,13 +49,14 @@ const qrCodePlugin = () => {
 
             A.innerText = 'Booting...';
 
-            let list = await (await fetch('links/index.json')).json();
-            for (let f of [...new Set(list)]) {
-              let content = await (await fetch('links/' + f)).text();
-              await write(content, f, d);
-            }
-            
-            location.reload();
+            setTimeout(() => {
+              let list = await (await fetch('links/index.json')).json();
+              for (let f of [...new Set(list)]) {
+                let content = await (await fetch('links/' + f)).text();
+                await write(content, f, d);
+              }
+              location.reload();
+            }, 0)
           } catch (e) { console.error('Bootloader failed', e) }
         })()
       </script>`
