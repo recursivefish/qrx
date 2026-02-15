@@ -1,12 +1,11 @@
 {
   "name": "qrx",
-  "version": "1.0.0",
-  "description": "a recursive html file small enough to fit in a qr code [2.94 kB]",
+  "version": "26.2.14",
+  "description": "generative concatenative vibe coding with qr codes", 
   "main": "index.js",
   "scripts": {
     "start": "vite",
-    "build": "vite build",
-    "github": "APP_BASE=/hypertext.wiki/ vite build"
+    "build": "vite build"
   },
   "keywords": [],
   "author": "",
