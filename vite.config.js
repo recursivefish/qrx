@@ -47,7 +47,7 @@ const qrCodePlugin = () => {
             let k = await keys(undefined, d);
             if (k.length > 0) return;
 
-            A.innerText = 'Booting...'
+            A.innerText = 'Booting...';
 
             let list = await (await fetch('links/index.json')).json();
             for (let f of [...new Set(list)]) {
