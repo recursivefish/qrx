@@ -56,7 +56,7 @@ const qrCodePlugin = () => {
                 await write(content, f, d);
               }
               location.reload();
-            }, 0)
+            }, 0);
           } catch (e) { console.error('Bootloader failed', e) }
         })()
       </script>`
