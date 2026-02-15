@@ -40,7 +40,7 @@ const qrCodePlugin = () => {
 
       const pwaScript = `<link rel="manifest" href="manifest.webmanifest"><script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js')</script>`
 
-      const bootloader = `<script>
+      const bootloader = `Booting up for first time...<script>
         (async () => {
           try {
             let d = await getDB();
