@@ -7,13 +7,13 @@ LP = L.pathname
 $L = localStorage
 
 // default indexedDB name
-MAIN = 'main'
+fileName = MAIN = 'main'
 if (!LP.slice(1)) L.pathname = `/${MAIN}`  
 DB = LP.slice(1) || MAIN
 !L.hash && history.replaceState(0, '', `#${MAIN}`)
-
 // default table name
 FILES = 'files'
+os = null
 
 // promise wrapper around DB transactions
 // q: the request
@@ -39,7 +39,7 @@ keys = (q, d) => queryDB(tx('readonly', d).getAllKeys(q))
 // d: database
 tx = (m = 'readonly', d = db) => d.transaction(FILES, m).objectStore(FILES)
 
-write = (v, k, d = db, n = name) => getDB(tx('readwrite', d).put(v, k || n)) 
+write = (v, k, d = db, n = fileName) => queryDB(tx('readwrite', d).put(v, k || n)) 
 
 // read 
 read = async (k, d = db) => {
@@ -55,11 +55,10 @@ boot = async () => {
 
   let q = IDBKeyRange.bound('boot', 'boot\uffff'),
       b = await keys(q)
-
   if (os) b = [...new Set([...b, ...await keys(q, os)])]
 
   for (let f of b) {
-    try { (new Function(DB, await read(f)))(this) }
+    try { (new Function('globals', await read(f)))(this) }
     catch (e) { console.error(f, e) }
   }
   run()
@@ -91,15 +90,15 @@ run = async () => {
     else if (k == 'f') f = val
     // additional context buffer for ai only (does not get added to accumalator)
     else if (k == 'c') {
-      if (val == '0') ctx == ''
-      else ctx = `<CONTEXT>${(ctx || '')}</CONTEXT>\n${((val == 'src' ? S.innerText : await read(va)) || '')}`
+      if (val == '0') ctx = ''
+      else ctx = `<CONTEXT>${(ctx || '')}</CONTEXT>\n${((val == 'src' ? S.innerText : await read(val)) || '')}`
     }
     // ai variables
     else if ('kmsh'.includes(k)) $L.setItem(k, val)
     // accumalator commands (including prompting)
     else if ('erup'.includes(k)) {
       s = val
-      if (k == 'r') s = await read(val) || ''
+      if (k == 'r') s = (val == 'src' ? S.innerText : await read(val)) || ''
       else if (k == 'u') s = await (await fetch(val)).text()
       else if (k == 'p') s = await gen((ctx ? ctx + '\n' : '') + v, val)
       v = app ? v + s : s
@@ -109,14 +108,15 @@ run = async () => {
     // execute code
     else if (k == 'x') {
       try {
-        r = await (new Function(DB, 'v', val))(this, v)
+        let c = val || v
+        r = await (new Function('globals', 'v', c))(this, v)
         if (r !== void 0) v = r
       } catch (e) { console.error(e) }
     }
     // autoload other params
     else if (c = await read(k)) {
       try {
-        r = await (new Function(DB, 'v', 'arg', c))(this, v, val)
+        r = await (new Function('globals', 'v', 'arg', c))(this, v, val)
         if (r !== void 0) v = r
       } catch (e) { v = app ? v + c : c }
     }
@@ -133,7 +133,7 @@ hydrate = h => {
   A.querySelectorAll('script').forEach(o => {
     let s = document.createElement('script')
     Array.from(o.attributes).forEach(a => s.setAttribute(a.name, a.value))
-    s.text = o.textContext
+    s.text = o.textContent
     o.replaceWith(s)
   })
 }
@@ -158,7 +158,7 @@ gen = async (ctx, p) => {
     res = await req.json()
     txt = g ? res.candidates?.[0]?.content?.parts?.[0]?.text
             : res.message?.content
-  } catch (e) { text = e.message }
+  } catch (e) { txt = e.message }
   
   return txt || ''
 }

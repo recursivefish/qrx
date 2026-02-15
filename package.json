@@ -1,11 +1,12 @@
 {
-  "name": "hypertext.wiki",
+  "name": "qrx",
   "version": "1.0.0",
-  "description": "",
+  "description": "a recursive html file small enough to fit in a qr code [2.94 kB]",
   "main": "index.js",
   "scripts": {
     "start": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "github": "APP_BASE=/hypertext.wiki/ vite build"
   },
   "keywords": [],
   "author": "",
