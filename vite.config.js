@@ -40,12 +40,14 @@ const qrCodePlugin = () => {
 
       const pwaScript = `<link rel="manifest" href="manifest.webmanifest"><script>if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js')</script>`
 
-      const bootloader = `Booting up for first time...<script>
+      const bootloader = `<script>
         (async () => {
           try {
             let d = await getDB();
             let k = await keys(undefined, d);
             if (k.length > 0) return;
+
+            A.innerText = 'Booting...'
 
             let list = await (await fetch('links/index.json')).json();
             for (let f of [...new Set(list)]) {
