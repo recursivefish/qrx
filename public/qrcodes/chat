@@ -1,0 +1,44 @@
+#chat?e&w&p=TASK: output HTML wireframe for a simple chatbot
+  - components:
+    - header
+      - model details
+        - model name
+        - model host
+        - apikey (type=password)
+    - messages area
+    - footer
+      - resizable textarea
+      - submit
+  - css: use flex so that the messages area fits the space between the header and footer
+  - no javascript
+  - dont include html/head/body tags just the wireframe
+&w&a=1&p=TASK: output a SCRIPT tag that populates the header details
+  - set model name to value of localStorage.getItem('m')
+  - set model host to value of localStorage.getItem('h')
+  - set apikey to value of localStorage.getItem('k')
+  - just read the values (dont update localstorage on change)
+&w&c=src&p=TASK: output a SCRIPT tag that handles the actual chat
+  - the attached CONTEXT gives you clues on how to handle chat
+    - there a special case for "google"
+  - reimplement but with streaming use streaming mode
+    - for "google" the endpoint would be :streamGenerateContent
+    - for any other host, set stream to true
+  - create a hook system so that we can add context transformers just before the prompt is sent to the ai
+    - just use a global chatPlugins = {pluginName: {callback: function (currentPrompt, fullChat) {returns transformedText}}}
+    - create a plugin that console.logs the text before it's sent
+  - send the full chat + the users prompt as a single string (no need to send array of messages)
+  - send when user presses either CTRL+ENTER inside the textarea OR when they press submit button
+  - textarea is cleared upon submit
+  - textarea is resizable
+  - do not autoscroll the page
+&c=0&w
+&w&p=TASK: output a SCRIPT tag to add a new context transformer plugin
+  - look for [[link]] in the current prompt
+    - use `read(link).then(context=>{})` to replace the [[link]] with the context
+    - console.log the link and the context
+  - return the transformed context
+  - recursively look within [[links]] up to 2 deep by default
+  - only [[link]] in the current PROMPT not the whole chat
+  - try catch it often the links wont exist yet
+&w
+

@@ -1,0 +1,43 @@
+#main?e&w&p=TASK: output HTML wireframe for a windows 95 simulator
+  - wireframe a start button and panel
+  - a reusable window template with
+    - title
+    - min, max, close buttons
+    - address bar with refresh icon and "Go" button
+  - windows teal background
+  - start menu with start button and time area
+  - no javascript
+  - hide templates by default
+  - don't include html/head/body tags just the wireframe
+&w&a=1&p=TASK: output SCRIPT tag for rendering top level icons
+  - loop through each indexeddb record (the db name is in the `fileName` global)
+  - keys can have slashes in them denoting folders
+  - create a 📄 icon for every top level file
+    - the label is everything after the final / (or the whole string)
+  - create a 📁 icon for every top level folder
+    - the label is everything before the first / at that level
+&w&a=1&p=TASK: output SCRIPT tag for File Explorer
+  - when folder icon is single clicked or tapped, show a window for it
+  - set the addressbar to full/folder/path
+  - focus the addressbar
+  - generate more icons and folders for the current folder inside the window
+  - when clicking on a folder inside File Explorer update the addressbar and icons
+  - clicking the Go button or pressing enter in the address bar navigates that window
+  - don't handle other window interaction yet
+&w&a=1&p=TASK: output SCRIPT tag for showing windows on icon clicks
+  - when file icon is single clicked or tapped, show a window for it
+  - show a full size iframe in the windows content area
+  - set the addressbar to full/file/path
+  - set the iframe to ${fileName}#${full/file/path}
+  - listen for #hash changes inside the iframe and update the addressbar on change
+  - update iframe when user presses in the addressbar or presses Go
+  - do this for file icons in folders too
+  - don't handle other window interaction yet
+&w&a=1&p=TASK: output SCRIPT tag for handling windows
+  - make windows draggable by dragging the titlebar
+  - make windows resizable
+  - make windows closable
+  - make windows maximizable (and restore size when pressed again)
+  - make windows minizable (and show an icon for it in the startbar
+&w
+

@@ -8,7 +8,7 @@ L = location
 $L = localStorage
 
 // default indexedDB name
-fileName = MAIN = 'main'
+filename = MAIN = 'main'
 DB = L.pathname.slice(1) || MAIN
 !L.hash && history.replaceState(0, '', `#${MAIN}`)
 // default table name
@@ -39,12 +39,12 @@ keys = (q, d) => queryDB(tx('readonly', d).getAllKeys(q))
 // d: database
 tx = (m = 'readonly', d = db) => d.transaction(FILES, m).objectStore(FILES)
 
-write = (v, k, d = db, n = fileName) => queryDB(tx('readwrite', d).put(v, k || n)) 
+write = (v, k, d = db, n = filename) => queryDB(tx('readwrite', d).put(v, k || n)) 
 
 // read 
 read = async (k, d = db) => {
   d = d.trim ? await getDB(d) : d
-  let v = await queryDB(tx('readonly', d).get(k || fileName))
+  let v = await queryDB(tx('readonly', d).get(k || filename))
   return !v && d == db && os ? read(k, os) : v
 }
 
@@ -74,7 +74,7 @@ run = async () => {
 
   let c, ctx, h = L.hash.slice(1),
       [n, q] = h.split('?'),
-      f = fileName = n,
+      f = filename = n,
       p = new URLSearchParams(q),
       v = await read(n) || '',
       app = false // append mode
