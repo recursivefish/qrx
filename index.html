@@ -3,13 +3,11 @@
 <script id=S>
 // shorthands
 L = location
-LP = L.pathname
 $L = localStorage
 
 // default indexedDB name
 fileName = MAIN = 'main'
-if (!LP.slice(1)) L.pathname = `/${MAIN}`  
-DB = LP.slice(1) || MAIN
+DB = L.pathname.slice(1) || MAIN
 !L.hash && history.replaceState(0, '', `#${MAIN}`)
 // default table name
 FILES = 'files'
