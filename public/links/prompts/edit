@@ -1,0 +1,23 @@
+#edit?e&w&p=TASK: output HTML wireframe for a file editor
+  - fields: textarea
+  - components: status bar with character count
+  - just HTML and CSS
+  - use flex to make the textarea fill full height of window
+  - no javascript
+  - dont include html/head/body tags just the wireframe
+&w&a=1&p=TASK: output a SCRIPT tag that adds autosaving
+  - `read()`, `write()`, and `filename` are globally available to you
+  - use `read(filename).then(callback)` to read the current page into the textarea
+  - on textarea update autosave the contents with `write(value, filename).then(callback)`
+  - run immediately, do not wait for DOMContentLoaded etc
+  - listen for URL hash fragment changes
+    - `filename` will automatically contain the new file name
+    - update the textarea with the new page content
+  - focus the textarea
+&w&a=1&p=TASK: output a SCRIPT tag that adds statusbar features
+  - on textarea input update the statusbar to show number of characters and bytes in the editor
+&w&a=1&p=TASK: output a SCRIPT tag that reloads the editor when edited from another browser tab
+  - use broadcast channel api to trigger an event when the editor changes, passing the global filename in `filename`
+  - listen to this same broadcast, if the current `filename` matches the one in the event, use `read(filename).then(callback)` to load in the data
+  - don't dispatch event if called from same browser tab
+&w
