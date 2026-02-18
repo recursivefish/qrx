@@ -1,19 +1,20 @@
-# Codex Hypertext
-
-## QRx Kernel 26.02.15 (index.html)
-
-![Q for QRx][./public/favicon.png]  
-![QR Code for QRx Kernel 26.02.15](./public/index.qr.png)
+<div align=center>
+  <div><img alt="Q for QRx" src="./public/favicon.png" width=96></div>
+  <h1>Generative QR Coding (QRx)</h1>
+  <p>QRx Kernel 26.02.15 (index.html)</p>
+  <div><img alt="QR Code for QRx Kernel 26.02.15" src="./public/index.qr.png" width=400></div>
+</div>
+<br>
 
 This qr encodes an html file turning any browser capable device since the 90s into an offline-first **ruliadic prism** that can help you do literally anything possible. It does this by reimagining the browser's local storage as a **regenerative file system** composed from **hyperlinks** that functions as a prompt chaining interface
 
-If you open that qr in the browser and scan or click the rest of the **hyperlinks** in this document that back to it you, will end up with something like [**https://hypertext.wiki**](https://hypertext.wiki) 
+If you open that qr in the browser and scan or click the rest of the **hyperlinks** in this document that back to it you, will end up with something like [**https://qrx.world**](https://qrx.world) 
 
 
 
 
 
-=============================
+-----------------------------
 
 
 
