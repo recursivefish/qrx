@@ -1,28 +1,23 @@
-> 🏗️ Work in progress
+# Codex Hypertext
 
-# QRx - vibe coding with qr codes
+## QRx Kernel 26.02.15 (index.html)
 
-![251031](https://github.com/user-attachments/assets/a3aeac2e-698e-425d-8d0e-613f2f6e371e)
+![Q for QRx][./public/favicon.png]  
+![QR Code for QRx Kernel 26.02.15](./public/index.qr.png)
 
-**permeating the ruliad is a bubbling matrix of 1s and 0s, the dataverse's analogue of the universe's the quantum foam**
+This qr encodes an html file turning any browser capable device since the 90s into an offline-first **ruliadic prism** that can help you do literally anything possible. It does this by reimagining the browser's local storage as a **regenerative file system** composed from **hyperlinks** that functions as a prompt chaining interface
 
-everything that can digitally exist has always existed. this document describes two approaches for hyperstitioning the dataverse:
-1. using recursive data uri's to spontaneously generate "**boltzmann websites**"
-2. mapping hyperlink #hashes to localstorage allowing for the emergence of self generating generative links
+If you open that qr in the browser and scan or click the rest of the **hyperlinks** in this document that back to it you, will end up with something like [**https://hypertext.wiki**](https://hypertext.wiki) 
 
-to help align your dataversal demiurges this document also explores the teleology of hypertext including:
-1. shepherding streams of consciousness into streams of tokens
-2. digital transmigration through the inverse: shepherding streams of tokens into streams of consciousness
 
-for convenience this repository also contains prebaked dataverses and other resources:
-1. [qrx.world](https://qrx.world) - a qr code driven 1995 simulated mesh network
-2. [r/QRCoding](https://reddit.com/r/qrcoding) - a subreddit for research, memes, and discussions
 
----
 
-# Kernel 26.02.15 (index.html)
 
-![kernel](./public/index.qr.png)
+=============================
+
+
+
+
 
 # Core flags
 The above Kernel exposes the following URL `?query` params
