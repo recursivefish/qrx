@@ -1,355 +1,247 @@
-<style>
-  :root {
-    --bg-color: #ffffff;
-    --header-bg: #f5f5f5;
-    --border-color: #dddddd;
-    --padding: 1rem;
-  }
-  
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
+<div style="display: flex; flex-direction: column; height: 100vh; font-family: sans-serif;">
+    <header style="padding: 1rem; background-color: #f5f5f5; border-bottom: 1px solid #ddd;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <label style="display: flex; flex-direction: column;">
+                Model Name
+                <input type="text" style="padding: 4px;">
+            </label>
+            <label style="display: flex; flex-direction: column;">
+                Model Host
+                <input type="text" style="padding: 4px;">
+            </label>
+            <label style="display: flex; flex-direction: column;">
+                API Key
+                <input type="password" style="padding: 4px;">
+            </label>
+        </div>
+    </header>
 
-  #app-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    font-family: sans-serif;
-  }
-
-  #chat-header {
-    flex: 0 0 auto;
-    background-color: var(--header-bg);
-    padding: var(--padding);
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-  }
-
-  #chat-header input {
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    flex: 1;
-  }
-
-  #chat-messages {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    padding: var(--padding);
-    background-color: var(--bg-color);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  #chat-footer {
-    flex: 0 0 auto;
-    padding: var(--padding);
-    background-color: var(--header-bg);
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-  }
-
-  #message-input {
-    flex: 1;
-    resize: vertical;
-    min-height: 50px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  #send-button {
-    height: 50px;
-    padding: 0 20px;
-    cursor: pointer;
-  }
-</style>
-
-<div id="app-container">
-  <header id="chat-header">
-    <div id="model-details-container" style="display:contents;">
-      <input type="text" id="model-name" placeholder="Model Name (e.g. gpt-4)">
-      <input type="text" id="model-host" placeholder="Host URL">
-      <input type="password" id="api-key" placeholder="API Key">
+    <div style="flex: 1; overflow-y: auto; padding: 1rem; background-color: #fff;">
+        <!-- Messages Area -->
     </div>
-  </header>
 
-  <div id="chat-messages">
-    <!-- Messages will be injected here -->
-  </div>
-
-  <footer id="chat-footer">
-    <textarea id="message-input" placeholder="Type a message..."></textarea>
-    <button id="send-button">Submit</button>
-  </footer>
+    <footer style="padding: 1rem; background-color: #f5f5f5; border-top: 1px solid #ddd; display: flex; gap: 10px;">
+        <textarea style="flex: 1; resize: vertical; padding: 0.5rem; min-height: 50px;"></textarea>
+        <button type="submit" style="padding: 0 1.5rem; cursor: pointer;">Submit</button>
+    </footer>
 </div><script>
-  var modelNameInput = document.getElementById('model-name');
-  var modelHostInput = document.getElementById('model-host');
-  var apiKeyInput = document.getElementById('api-key');
-
-  var savedModel = localStorage.getItem('m');
-  var savedHost = localStorage.getItem('h');
-  var savedKey = localStorage.getItem('k');
-
-  if (savedModel) modelNameInput.value = savedModel;
-  if (savedHost) modelHostInput.value = savedHost;
-  if (savedKey) apiKeyInput.value = savedKey;
-</script><script>
-var chatPlugins = {
-  log: {
-    callback: function(t, f) {
-      console.log("Sending:", t);
-      return t;
-    }
-  }
-};
-var chatHistory = "";
-var msgs = document.getElementById('chat-messages');
-var inp = document.getElementById('message-input');
-var btn = document.getElementById('send-button');
-var mIn = document.getElementById('model-name');
-var hIn = document.getElementById('model-host');
-var kIn = document.getElementById('api-key');
-
-[mIn, hIn, kIn].forEach(function(e) {
-  e.oninput = function() {
-    localStorage.setItem('m', mIn.value);
-    localStorage.setItem('h', hIn.value);
-    localStorage.setItem('k', kIn.value);
-  }
-});
-
-function handleChat() {
-  var txt = inp.value;
-  if (!txt.trim()) return;
-  inp.value = "";
-  
-  var d = document.createElement('div');
-  d.style.padding = "10px";
-  d.style.background = "#eef";
-  d.innerText = txt;
-  msgs.appendChild(d);
-
-  var prompt = chatHistory ? (chatHistory + "\nUser: " + txt) : txt;
-  
-  for (var k in chatPlugins) {
-    prompt = chatPlugins[k].callback(prompt, chatHistory);
-  }
-
-  var ad = document.createElement('div');
-  ad.style.padding = "10px";
-  ad.style.borderTop = "1px solid #eee";
-  ad.innerText = "...";
-  msgs.appendChild(ad);
-
-  var mod = mIn.value || "gemini-1.5-flash";
-  var host = hIn.value;
-  var key = kIn.value;
-  var isG = host === "google" || (!host && !key.startsWith("sk-")); 
-  
-  // If host is explicitly google or inferred
-  var url = isG 
-    ? `https://generativelanguage.googleapis.com/v1beta/models/${mod}:streamGenerateContent?key=${key}`
-    : host;
-
-  var body = isG 
-    ? { contents: [{ parts: [{ text: prompt }] }] }
-    : { model: mod, messages: [{ role: "user", content: prompt }], stream: true };
-
-  var headers = { "Content-Type": "application/json" };
-  if (!isG && key) headers["Authorization"] = "Bearer " + key;
-
-  fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body) })
-    .then(async r => {
-      var rdr = r.body.getReader();
-      var dec = new TextDecoder();
-      var bot = "";
-      ad.innerText = "";
-      
-      while (true) {
-        var { done, value } = await rdr.read();
-        if (done) break;
-        var chunk = dec.decode(value, { stream: true });
-        
-        if (isG) {
-          // Google JSON stream parsing hack
-          var re = /"text":\s*"((?:[^"\\]|\\.)*)"/g;
-          var m;
-          while ((m = re.exec(chunk)) !== null) {
-            try {
-              var t = JSON.parse('"' + m[1] + '"');
-              bot += t;
-              ad.innerText += t;
-            } catch (e) {}
-          }
-        } else {
-          // SSE parsing
-          var lines = chunk.split('\n');
-          lines.forEach(l => {
-            if (l.startsWith("data: ") && l !== "data: [DONE]") {
-              try {
-                var j = JSON.parse(l.slice(6));
-                var c = j.choices?.[0]?.delta?.content || "";
-                bot += c;
-                ad.innerText += c;
-              } catch (e) {}
-            }
-          });
-        }
-      }
-      chatHistory = prompt + "\nAI: " + bot;
-    })
-    .catch(e => ad.innerText += "\nError: " + e);
+const inputs = document.querySelectorAll('header input');
+if (inputs.length >= 3) {
+    inputs[0].value = localStorage.getItem('m') || '';
+    inputs[1].value = localStorage.getItem('h') || '';
+    inputs[2].value = localStorage.getItem('k') || '';
 }
+</script><script>
+window.chatPlugins = {
+    logger: {
+        callback: (text, fullChat) => {
+            console.log("Transformed Prompt:", text);
+            return text;
+        }
+    }
+};
+
+const D = document,
+    Q = s => D.querySelector(s),
+    area = Q('div[style*="overflow-y: auto"]'),
+    txt = Q('footer textarea'),
+    btn = Q('footer button');
+
+D.querySelectorAll('header input').forEach((el, i) => 
+    el.oninput = () => localStorage.setItem(['m','h','k'][i], el.value)
+);
+
+const handleChat = async () => {
+    const val = txt.value.trim();
+    if (!val) return;
+    txt.value = "";
+
+    const userDiv = D.createElement('div');
+    userDiv.style = "padding:10px;background:#f5f5f5;margin:5px 0;border-radius:5px;";
+    userDiv.innerText = val;
+    area.appendChild(userDiv);
+
+    const aiDiv = D.createElement('div');
+    aiDiv.style = "padding:10px;white-space:pre-wrap;margin:5px 0;";
+    area.appendChild(aiDiv);
+
+    let prompt = area.innerText;
+    Object.values(window.chatPlugins).forEach(p => {
+        if(p.callback) prompt = p.callback(prompt, area.innerText);
+    });
+
+    const m = localStorage.getItem('m'),
+        h = localStorage.getItem('h'),
+        k = localStorage.getItem('k'),
+        isG = h === 'google';
+
+    const url = isG ? 
+        `https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?key=${k}` : h;
+    
+    const headers = { "Content-Type": "application/json" };
+    if (!isG && k) headers.Authorization = `Bearer ${k}`;
+
+    const body = JSON.stringify(isG ? 
+        { contents: [{ parts: [{ text: prompt }] }] } : 
+        { model: m, stream: true, messages: [{ role: "user", content: prompt }] }
+    );
+
+    try {
+        const res = await fetch(url, { method: "POST", headers, body });
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "", gIdx = 0;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            if (isG) {
+                const regex = /"text":\s*"((?:[^"\\]|\\.)*)"/g;
+                regex.lastIndex = gIdx;
+                let match;
+                while ((match = regex.exec(buffer)) !== null) {
+                    aiDiv.innerText += JSON.parse(`"${match[1]}"`);
+                    gIdx = regex.lastIndex;
+                }
+            } else {
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+                for (const line of lines) {
+                    if (line.trim().startsWith("data:") && !line.includes("[DONE]")) {
+                        try {
+                            const json = JSON.parse(line.slice(5));
+                            aiDiv.innerText += json.choices?.[0]?.delta?.content || json.message?.content || "";
+                        } catch (e) {}
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        aiDiv.innerText += "\nError: " + e.message;
+    }
+};
 
 btn.onclick = handleChat;
-inp.onkeydown = function(e) {
-  if (e.ctrlKey && e.key === "Enter") handleChat();
+txt.onkeydown = e => {
+    if (e.ctrlKey && e.key === "Enter") {
+        e.preventDefault();
+        handleChat();
+    }
 };
 </script><script>
-// Global read function wrapper
-window.read = async function(url) {
-  try {
-    var res = await fetch(url);
-    if (!res.ok) throw new Error("Status: " + res.status);
-    return await res.text();
-  } catch (e) {
-    throw e;
-  }
-};
+window.chatPlugins.contextExpander = {
+    callback: async (prompt) => {
+        const regex = /\[\[(.*?)\]\]/g;
+        const matches = [...prompt.matchAll(regex)];
+        const unique = [...new Set(matches.map(m => m[1]))];
+        const replacements = {};
 
-// Update handleChat to support async plugins
-handleChat = async function() {
-  var txt = inp.value;
-  if (!txt.trim()) return;
-  inp.value = "";
-  
-  var d = document.createElement('div');
-  d.style.padding = "10px";
-  d.style.background = "#eef";
-  d.innerText = txt;
-  msgs.appendChild(d);
-
-  // Construct prompt
-  var prompt = chatHistory ? (chatHistory + "\nUser: " + txt) : txt;
-  
-  // Async Plugin Loop
-  for (var k in chatPlugins) {
-    try {
-      var res = chatPlugins[k].callback(prompt, chatHistory);
-      if (res instanceof Promise) {
-        prompt = await res;
-      } else {
-        prompt = res;
-      }
-    } catch(e) { console.error("Plugin error (" + k + "):", e); }
-  }
-
-  var ad = document.createElement('div');
-  ad.style.padding = "10px";
-  ad.style.borderTop = "1px solid #eee";
-  ad.innerText = "...";
-  msgs.appendChild(ad);
-
-  var mod = mIn.value || "gemini-1.5-flash";
-  var host = hIn.value;
-  var key = kIn.value;
-  var isG = host === "google" || (!host && !key.startsWith("sk-")); 
-  var url = isG 
-    ? `https://generativelanguage.googleapis.com/v1beta/models/${mod}:streamGenerateContent?key=${key}`
-    : host;
-
-  var body = isG 
-    ? { contents: [{ parts: [{ text: prompt }] }] }
-    : { model: mod, messages: [{ role: "user", content: prompt }], stream: true };
-
-  var headers = { "Content-Type": "application/json" };
-  if (!isG && key) headers["Authorization"] = "Bearer " + key;
-
-  fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body) })
-    .then(async r => {
-      var rdr = r.body.getReader();
-      var dec = new TextDecoder();
-      var bot = "";
-      ad.innerText = "";
-      
-      while (true) {
-        var { done, value } = await rdr.read();
-        if (done) break;
-        var chunk = dec.decode(value, { stream: true });
-        
-        if (isG) {
-          var re = /"text":\s*"((?:[^"\\]|\\.)*)"/g;
-          var m;
-          while ((m = re.exec(chunk)) !== null) {
-            try {
-              var t = JSON.parse('"' + m[1] + '"');
-              bot += t;
-              ad.innerText += t;
-            } catch (e) {}
-          }
-        } else {
-          var lines = chunk.split('\n');
-          lines.forEach(l => {
-            if (l.startsWith("data: ") && l !== "data: [DONE]") {
-              try {
-                var j = JSON.parse(l.slice(6));
-                var c = j.choices?.[0]?.delta?.content || "";
-                bot += c;
-                ad.innerText += c;
-              } catch (e) {}
+        await Promise.all(unique.map(async (link) => {
+            let table = window.DB;
+            let key = link;
+            if (link.includes('#')) {
+                const parts = link.split('#');
+                if (parts[0]) table = parts[0];
+                key = parts[1];
             }
-          });
-        }
-      }
-      chatHistory = prompt + "\nAI: " + bot;
-    })
-    .catch(e => ad.innerText += "\nError: " + e);
+            try {
+                const ctx = await read(key, table);
+                if (ctx) {
+                    console.log(`Linked: ${table}#${key}`, ctx);
+                    replacements[link] = `<context file="${table}#${key}">${ctx}</context>`;
+                }
+            } catch (e) {}
+        }));
+
+        return prompt.replace(regex, (m, p1) => replacements[p1] || m);
+    }
 };
 
-// Rebind button since function reference changed
-btn.onclick = handleChat;
+// Patch runner to support async plugins
+const _b = document.querySelector('footer button'),
+      _t = document.querySelector('footer textarea'),
+      _a = document.querySelector('div[style*="overflow-y: auto"]');
 
-// Add Context Transformer Plugin
-chatPlugins.contextLoader = {
-  callback: async function(t, h) {
-    async function resolveLinks(str, depth) {
-      if (depth > 2) return str;
-      
-      var parts = str.split(/(\[\[.*?\]\])/g);
-      var modified = false;
-      
-      for (var i = 0; i < parts.length; i++) {
-        var p = parts[i];
-        if (p.startsWith('[[') && p.endsWith(']]')) {
-          var link = p.slice(2, -2);
-          try {
-            // Using syntax requested: read(link).then
-            var context = await read(link).then(c => c);
-            console.log("Link:", link);
-            console.log("Context:", context);
-            
-            // Recursive check
-            parts[i] = await resolveLinks(context, depth + 1);
-            modified = true;
-          } catch(e) {
-            // Link failed, keep original text
-            console.warn("Failed to load:", link);
-          }
-        }
-      }
-      return parts.join('');
+_b.onclick = async () => {
+    const val = _t.value.trim();
+    if (!val) return;
+    _t.value = "";
+
+    const userDiv = document.createElement('div');
+    userDiv.style = "padding:10px;background:#f5f5f5;margin:5px 0;border-radius:5px;";
+    userDiv.innerText = val;
+    _a.appendChild(userDiv);
+
+    const aiDiv = document.createElement('div');
+    aiDiv.style = "padding:10px;white-space:pre-wrap;margin:5px 0;";
+    _a.appendChild(aiDiv);
+
+    let prompt = _a.innerText;
+    
+    // Async plugin execution
+    for (const p of Object.values(window.chatPlugins)) {
+        if (p.callback) prompt = await p.callback(prompt, _a.innerText);
     }
 
-    return await resolveLinks(t, 0);
-  }
+    const m = localStorage.getItem('m'),
+          h = localStorage.getItem('h'),
+          k = localStorage.getItem('k'),
+          isG = h === 'google';
+
+    const url = isG ? 
+        `https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?key=${k}` : h;
+    
+    const headers = { "Content-Type": "application/json" };
+    if (!isG && k) headers.Authorization = `Bearer ${k}`;
+
+    const body = JSON.stringify(isG ? 
+        { contents: [{ parts: [{ text: prompt }] }] } : 
+        { model: m, stream: true, messages: [{ role: "user", content: prompt }] }
+    );
+
+    try {
+        const res = await fetch(url, { method: "POST", headers, body });
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "", gIdx = 0;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            if (isG) {
+                const regex = /"text":\s*"((?:[^"\\]|\\.)*)"/g;
+                regex.lastIndex = gIdx;
+                let match;
+                while ((match = regex.exec(buffer)) !== null) {
+                    aiDiv.innerText += JSON.parse(`"${match[1]}"`);
+                    gIdx = regex.lastIndex;
+                }
+            } else {
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+                for (const line of lines) {
+                    if (line.trim().startsWith("data:") && !line.includes("[DONE]")) {
+                        try {
+                            const json = JSON.parse(line.slice(5));
+                            aiDiv.innerText += json.choices?.[0]?.delta?.content || json.message?.content || "";
+                        } catch (e) {}
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        aiDiv.innerText += "\nError: " + e.message;
+    }
+};
+
+_t.onkeydown = e => {
+    if (e.ctrlKey && e.key === "Enter") {
+        e.preventDefault();
+        _b.onclick();
+    }
 };
 </script>
